@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/VegetationPython/static/css/main.e6c13ad2.css",
-    "main.js": "/VegetationPython/static/js/main.e2127d06.js",
+    "main.js": "/VegetationPython/static/js/main.c95d64a1.js",
     "index.html": "/VegetationPython/index.html",
     "main.e6c13ad2.css.map": "/VegetationPython/static/css/main.e6c13ad2.css.map",
-    "main.e2127d06.js.map": "/VegetationPython/static/js/main.e2127d06.js.map"
+    "main.c95d64a1.js.map": "/VegetationPython/static/js/main.c95d64a1.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.e2127d06.js"
+    "static/js/main.c95d64a1.js"
   ]
 }
