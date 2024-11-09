@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-// 型定義の部分を修正・追加
 interface AnalysisResult {
   vegetation_coverage: number;
   vegetation_pixels: number;
@@ -14,8 +13,29 @@ interface AnalysisResult {
   };
 }
 
-// 解析実行部分を修正
-const handleAnalyze = async () => {
+const VegetationAnalysis: React.FC = () => {
+  // 状態管理
+  const [file, setFile] = useState<File | null>(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [language, setLanguage] = useState<'ja' | 'en'>('ja');
+
+  // 画像アップロード処理
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const uploadedFile = event.target.files?.[0];
+    if (uploadedFile) {
+      setFile(uploadedFile);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setOriginalImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(uploadedFile);
+    }
+  };
+
+  // 解析実行
+  const handleAnalyze = async () => {
     if (!file) return;
 
     setIsProcessing(true);
@@ -39,14 +59,7 @@ const handleAnalyze = async () => {
     } finally {
       setIsProcessing(false);
     }
-};
-
-const VegetationAnalysis: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [originalImage, setOriginalImage] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [language, setLanguage] = useState<'ja' | 'en'>('ja');
+  };
 
   // 言語設定
   const translations = {
@@ -82,46 +95,7 @@ const VegetationAnalysis: React.FC = () => {
 
   const t = translations[language];
 
-  // 画像アップロード処理
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const uploadedFile = event.target.files?.[0];
-    if (uploadedFile) {
-      setFile(uploadedFile);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setOriginalImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(uploadedFile);
-    }
-  };
-
-  // 解析実行
-  const handleAnalyze = async () => {
-    if (!file) return;
-
-    setIsProcessing(true);
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/analyze`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-      setResult(response.data);
-    } catch (error) {
-      console.error('Analysis error:', error);
-      alert('Error analyzing image');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
+  // UI描画
   return (
     <div className="max-w-6xl mx-auto p-4 space-y-6 bg-white rounded-lg shadow">
       <div className="flex justify-between items-center">
