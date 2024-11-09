@@ -20,9 +20,14 @@ origins = [
     "https://Gucchyon.github.io/VegetationPython"
 ]
 
+# main.py のCORS設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://gucchyon.github.io",
+        "https://gucchyon.github.io/VegetationPython"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -112,27 +117,35 @@ class VegetationAnalysis:
             raise HTTPException(status_code=500, detail=f"Image processing error: {str(e)}")
 
 # APIエンドポイント
+# main.py の analyze_image エンドポイントを修正
 @app.post("/api/analyze")
 async def analyze_image(file: UploadFile = File(...)):
     """画像を解析するエンドポイント"""
     try:
+        print(f"Received file: {file.filename}")  # ファイル受信確認
         # 画像データの読み込み
         contents = await file.read()
+        print(f"File size: {len(contents)} bytes")  # ファイルサイズ確認
+        
         nparr = np.frombuffer(contents, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
+        
         if img is None:
+            print("Failed to decode image")  # デコードエラーの確認
             raise HTTPException(status_code=400, detail="Invalid image file")
 
+        print(f"Image shape: {img.shape}")  # 画像サイズ確認
+        
         # 解析実行
         analyzer = VegetationAnalysis()
         result = analyzer.process_image(img)
+        print(f"Analysis result: {result}")  # 結果確認
         
         return JSONResponse(content=result)
 
     except Exception as e:
+        print(f"Error details: {str(e)}")  # エラー詳細の出力
         raise HTTPException(status_code=500, detail=str(e))
-
 # ヘルスチェックエンドポイント
 @app.get("/health")
 async def health_check():
