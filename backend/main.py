@@ -16,8 +16,8 @@ app = FastAPI(title="Vegetation Analysis API")
 # CORS設定
 origins = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    os.getenv("FRONTEND_URL", ""),  # GitHub PagesのURL
+    "https://Gucchyon.github.io",
+    "https://Gucchyon.github.io/VegetationPython"
 ]
 
 app.add_middleware(
