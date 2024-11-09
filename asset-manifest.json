@@ -1,16 +1,15 @@
 {
   "files": {
-    "main.css": "/VegetationPython/static/css/main.f855e6bc.css",
-    "main.js": "/VegetationPython/static/js/main.4d725519.js",
+    "main.css": "/VegetationPython/static/css/main.e6c13ad2.css",
+    "main.js": "/VegetationPython/static/js/main.5f7857c1.js",
     "static/js/453.8ab44547.chunk.js": "/VegetationPython/static/js/453.8ab44547.chunk.js",
-    "static/media/logo.svg": "/VegetationPython/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/VegetationPython/index.html",
-    "main.f855e6bc.css.map": "/VegetationPython/static/css/main.f855e6bc.css.map",
-    "main.4d725519.js.map": "/VegetationPython/static/js/main.4d725519.js.map",
+    "main.e6c13ad2.css.map": "/VegetationPython/static/css/main.e6c13ad2.css.map",
+    "main.5f7857c1.js.map": "/VegetationPython/static/js/main.5f7857c1.js.map",
     "453.8ab44547.chunk.js.map": "/VegetationPython/static/js/453.8ab44547.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f855e6bc.css",
-    "static/js/main.4d725519.js"
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.5f7857c1.js"
   ]
 }
