@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
 // 型定義の部分を修正・追加
 interface AnalysisResult {
@@ -23,7 +23,7 @@ const handleAnalyze = async () => {
     formData.append('file', file);
 
     try {
-      const response: AxiosResponse<AnalysisResult> = await axios.post(
+      const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/analyze`,
         formData,
         {
@@ -32,7 +32,7 @@ const handleAnalyze = async () => {
           },
         }
       );
-      setResult(response.data);
+      setResult(response.data as AnalysisResult);
     } catch (error) {
       console.error('Analysis error:', error);
       alert('Error analyzing image');
