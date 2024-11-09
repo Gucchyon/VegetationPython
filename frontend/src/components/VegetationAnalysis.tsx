@@ -35,7 +35,9 @@ const VegetationAnalysis: React.FC = () => {
   };
 
   // 解析実行
-  const handleAnalyze = async () => {
+    // VegetationAnalysis.tsx の handleAnalyze 関数を修正
+// VegetationAnalysis.tsxでAPIのURLをログ出力
+const handleAnalyze = async () => {
     if (!file) return;
 
     setIsProcessing(true);
@@ -43,23 +45,31 @@ const VegetationAnalysis: React.FC = () => {
     formData.append('file', file);
 
     try {
+      const fullUrl = `${process.env.REACT_APP_API_URL}/api/analyze`;
+      console.log('Sending request to:', fullUrl);
+
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/analyze`,
+        fullUrl,
         formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          withCredentials: false,  // これを必ずfalseに
         }
       );
       setResult(response.data as AnalysisResult);
     } catch (error) {
-      console.error('Analysis error:', error);
-      alert('Error analyzing image');
+      console.error('Full error details:', error);
+      if (error instanceof Error) {
+        alert(`Error: ${error.message}`);
+      } else {
+        alert('An unexpected error occurred');
+      }
     } finally {
       setIsProcessing(false);
     }
-  };
+};
 
   // 言語設定
   const translations = {

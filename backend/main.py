@@ -24,13 +24,13 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
         "https://gucchyon.github.io",
-        "https://gucchyon.github.io/VegetationPython"
+        "http://localhost:3000",  # 開発環境用
     ],
-    allow_credentials=True,
+    allow_credentials=False,  # Falseに設定
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 class VegetationAnalysis:
@@ -118,39 +118,71 @@ class VegetationAnalysis:
 
 # APIエンドポイント
 # main.py の analyze_image エンドポイントを修正
+# backend/main.py
+
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+# CORSの設定を更新
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://gucchyon.github.io",
+        "http://localhost:3000",  # 開発環境用
+    ],
+    allow_credentials=False,  # Falseに設定
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"]
+)
+
+# デバッグ用のエンドポイント追加
+@app.get("/debug/cors")
+async def debug_cors():
+    return JSONResponse(
+        content={"message": "CORS check successful"},
+        headers={
+            "Access-Control-Allow-Origin": "https://gucchyon.github.io"
+        }
+    )
+
 @app.post("/api/analyze")
 async def analyze_image(file: UploadFile = File(...)):
-    """画像を解析するエンドポイント"""
     try:
-        print(f"Received file: {file.filename}")  # ファイル受信確認
-        # 画像データの読み込み
+        print(f"Receiving file: {file.filename}")  # デバッグログ
         contents = await file.read()
-        print(f"File size: {len(contents)} bytes")  # ファイルサイズ確認
-        
         nparr = np.frombuffer(contents, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         if img is None:
-            print("Failed to decode image")  # デコードエラーの確認
-            raise HTTPException(status_code=400, detail="Invalid image file")
-
-        print(f"Image shape: {img.shape}")  # 画像サイズ確認
+            raise HTTPException(status_code=400, detail="Invalid image format")
         
-        # 解析実行
         analyzer = VegetationAnalysis()
         result = analyzer.process_image(img)
-        print(f"Analysis result: {result}")  # 結果確認
         
-        return JSONResponse(content=result)
-
+        return JSONResponse(
+            content=result,
+            headers={
+                "Access-Control-Allow-Origin": "https://gucchyon.github.io",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*"
+            }
+        )
     except Exception as e:
-        print(f"Error details: {str(e)}")  # エラー詳細の出力
+        print(f"Error processing image: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-# ヘルスチェックエンドポイント
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# プリフライトリクエスト用のハンドラ
+@app.options("/api/analyze")
+async def options_analyze():
+    return JSONResponse(
+        content={},
+        headers={
+            "Access-Control-Allow-Origin": "https://gucchyon.github.io",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*"
+        }
+    )
