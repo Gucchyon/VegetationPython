@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
+// 型定義の部分を修正・追加
 interface AnalysisResult {
   vegetation_coverage: number;
   vegetation_pixels: number;
@@ -12,6 +13,33 @@ interface AnalysisResult {
     whole: Record<string, number>;
   };
 }
+
+// 解析実行部分を修正
+const handleAnalyze = async () => {
+    if (!file) return;
+
+    setIsProcessing(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response: AxiosResponse<AnalysisResult> = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/analyze`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      setResult(response.data);
+    } catch (error) {
+      console.error('Analysis error:', error);
+      alert('Error analyzing image');
+    } finally {
+      setIsProcessing(false);
+    }
+};
 
 const VegetationAnalysis: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
